@@ -1,0 +1,97 @@
+{
+  "name": "glow-comments",
+  "displayName": "Glow Comments",
+  "description": "High-visibility neon glowing comments, dynamic inline hex colors, and modern semantic code annotations.",
+  "version": "0.1.0",
+  "publisher": "shikharthakur",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shikharthakur2404/glow-comments"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Themes",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "comments",
+    "glow",
+    "neon",
+    "better comments",
+    "annotations",
+    "todo",
+    "highlight",
+    "cyberpunk"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "glowComments.insertTag",
+        "title": "Glow Comments: Insert Color Tag"
+      },
+      {
+        "command": "glowComments.toggleGlow",
+        "title": "Glow Comments: Toggle Glow Aura"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "glowComments.insertTag",
+          "group": "modification@100"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Glow Comments",
+      "properties": {
+        "glowComments.enableGlow": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable semi-transparent background aura glow for comments."
+        },
+        "glowComments.glowOpacity": {
+          "type": "number",
+          "default": 0.14,
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Opacity factor for background glow aura (0.05 to 0.4 recommended)."
+        },
+        "glowComments.enableBorder": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable subtle neon outline border on tagged comments."
+        },
+        "glowComments.bold": {
+          "type": "boolean",
+          "default": true,
+          "description": "Make tagged glowing comments bold."
+        },
+        "glowComments.customPresets": {
+          "type": "object",
+          "default": {},
+          "description": "Custom name-to-hex mappings (e.g. {\"matrix\": \"#00FF66\", \"warning\": \"#FF9900\"})."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --minify",
+    "watch": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
+    "package": "vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.80.0",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.3.3"
+  }
+}
