@@ -3,3 +3,8 @@ src/**
 tsconfig.json
 node_modules/**
 *.vsix
+demo.png
+AI_VIBE_CODING_VISION.md
+ARTICLE_DEVTO_MEDIUM.md
+FUTURE_UPDATES.md
+TEST_PLAYGROUND.ts

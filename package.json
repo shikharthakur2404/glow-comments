@@ -2,7 +2,7 @@
   "name": "glow-comments",
   "displayName": "Glow Comments",
   "description": "High-visibility neon glowing comments, dynamic inline hex colors, and modern semantic code annotations.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "shikharthakur",
   "repository": {
     "type": "git",
@@ -24,7 +24,9 @@
     "annotations",
     "todo",
     "highlight",
-    "cyberpunk"
+    "cyberpunk",
+    "diagnostics",
+    "audit"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -39,6 +41,18 @@
       {
         "command": "glowComments.toggleGlow",
         "title": "Glow Comments: Toggle Glow Aura"
+      },
+      {
+        "command": "glowComments.toggleAuditLens",
+        "title": "Glow Comments: Toggle Risk Audit Lens"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "glowComments.toggleAuditLens",
+        "key": "alt+cmd+g",
+        "mac": "cmd+shift+g",
+        "when": "editorTextFocus"
       }
     ],
     "menus": {
@@ -46,6 +60,10 @@
         {
           "command": "glowComments.insertTag",
           "group": "modification@100"
+        },
+        {
+          "command": "glowComments.toggleAuditLens",
+          "group": "modification@101"
         }
       ]
     },
@@ -73,6 +91,39 @@
           "type": "boolean",
           "default": true,
           "description": "Make tagged glowing comments bold."
+        },
+        "glowComments.enableDiagnosticGlow": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically illuminate compiler, linter (ESLint), and security warnings with radiant ambient auras."
+        },
+        "glowComments.diagnosticGlowLevels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Error",
+              "Warning",
+              "Information"
+            ]
+          },
+          "default": [
+            "Error",
+            "Warning"
+          ],
+          "description": "Severity levels from the Diagnostics API to project as glowing ambient auras."
+        },
+        "glowComments.glowUntaggedComments": {
+          "type": "boolean",
+          "default": false,
+          "description": "Apply a subtle ambient glow to all standard untagged comments (Disabled by default to preserve contrast)."
+        },
+        "glowComments.auditLensDimOpacity": {
+          "type": "number",
+          "default": 0.22,
+          "minimum": 0.05,
+          "maximum": 0.8,
+          "description": "Opacity factor for non-flagged safe code when the Risk Audit Lens is active (0.1 to 0.3 recommended)."
         },
         "glowComments.customPresets": {
           "type": "object",
