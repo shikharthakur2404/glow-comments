@@ -123,14 +123,14 @@ export function activate(context: vscode.ExtensionContext) {
       return bucket;
     };
 
-    // Regex to match comment lines across programming languages:
-    // 1. Single-line: //, #, --, ;, %
-    // 2. Multi-line tokens: /* ... */ or <!-- ... -->
-    const commentRegex = /(?:\/\/|#|--|;|%|\/\*|<!--)\s*([^\r\n*]*)/g;
+    // Line comments keep asterisks so "// * highlight" still matches.
+    // Block openers are tracked separately so a JSDoc "/**" is not treated as that tag.
+    const commentRegex = /(\/\/|#|--|;|%|\/\*|<!--)\s*([^\r\n]*)/g;
     let match: RegExpExecArray | null;
 
     while ((match = commentRegex.exec(text)) !== null) {
-      const commentContent = match[1];
+      const delimiter = match[1];
+      const commentContent = match[2];
       if (!commentContent) continue;
 
       const trimmed = commentContent.trim();
@@ -161,6 +161,10 @@ export function activate(context: vscode.ExtensionContext) {
       // Check Pattern 3: Semantic shortcuts (!, ?, TODO, *, HACK, FIXME, NOTE, //)
       if (!matchedHex) {
         for (const [prefix, def] of Object.entries(SEMANTIC_TAGS)) {
+          // "*" inside /* */ or <!-- --> is JSDoc punctuation, not a highlight tag.
+          if (prefix === '*' && (delimiter === '/*' || delimiter === '<!--')) {
+            continue;
+          }
           if (trimmed.startsWith(prefix) || trimmed.startsWith(`[${prefix}]`)) {
             matchedHex = def.color;
             isStrike = !!def.strike;

@@ -60,8 +60,8 @@
         "glowComments.glowOpacity": {
           "type": "number",
           "default": 0.14,
-          "minimum": 0.0,
-          "maximum": 1.0,
+          "minimum": 0,
+          "maximum": 1,
           "description": "Opacity factor for background glow aura (0.05 to 0.4 recommended)."
         },
         "glowComments.enableBorder": {
@@ -93,5 +93,6 @@
     "@types/vscode": "^1.80.0",
     "esbuild": "^0.20.0",
     "typescript": "^5.3.3"
-  }
+  },
+  "icon": "icon.png"
 }
