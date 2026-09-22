@@ -45,6 +45,8 @@ Your eyes glaze over the lines, assuming the machine handled the edge cases.
 
 Instead of passive text, critical lines radiate ambient luminous auras directly onto your screen, physically anchoring human visual attention onto high-entropy risk surfaces.
 
+![Glow Comments Optical Telemetry in Action](https://raw.githubusercontent.com/shikharthakur2404/glow-comments/main/demo.png)
+
 ```
        [ 500-LINE AI GENERATION ]
                    │

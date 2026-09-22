@@ -4,6 +4,8 @@
 
 Transform dead gray comments into an illuminated visual HUD. Whether you want subtle neon accent tags, vibrant cyberpunk warnings, or arbitrary hex color codes, **Glow Comments** renders luminous, aura-bordered annotations on the fly without bogging down your editor.
 
+![Glow Comments Live Preview](https://raw.githubusercontent.com/shikharthakur2404/glow-comments/main/demo.png)
+
 ---
 
 ## ✨ Features
