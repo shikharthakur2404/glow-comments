@@ -1,13 +1,13 @@
 # Glow Comments // Future Updates & Architecture Roadmap
 
-> **Operating Principle:** Test and validate v0.1.0 production baseline across real workloads first. Evaluate and deploy subsequent vectors sequentially, one by one.
+> **Operating Principle:** Test and validate v0.2.0 baseline across real workloads first. Sequence upcoming vectors by signal-to-noise ratio.
 
 ---
 
 ## 1. Architectural Leverage: Build vs. Borrow vs. Skip
 
 ```
-       [ EXISTING LINER & DIAGNOSTICS ECOSYSTEM ]
+       [ EXISTING LINTER & DIAGNOSTICS ECOSYSTEM ]
          (ESLint / Biome / TypeScript / Semgrep)
                            │
                            ▼ (vscode.languages.onDidChangeDiagnostics)
@@ -17,32 +17,31 @@
                            │
            ┌───────────────┴───────────────┐
            ▼                               ▼
- [ Ambient Glow by Severity ]     [ Risk-Scoped Audit Lens ]
-   (Info / Warn / Error / Hint)     (Dim clean code by 75%)
+ [ Semantic Rule-ID Chroma ]     [ Git Diff-Scoped Lens ]
+  (any: violet, sec: crimson)      (Isolates newly added risk)
 ```
 
 ---
 
-### A. BUILD (Maximum Leverage — Zero Competition)
+### A. NEXT PRIORITY (v0.3.0): The Signal-to-Noise Hardening
 
-1. **Diagnostics-as-Glow Renderer (`vscode.languages.onDidChangeDiagnostics`):**
-   * **Mechanism:** Do not build a custom AST scanner. Consume VS Code's native `Diagnostics` collection that ESLint, TypeScript, Biome, and Semgrep already output.
-   * **Transformation:** Re-skin squiggly underlines into ambient luminous aura borders.
-   * **Leverage:** Instantly inherits thousands of community-tuned rules without writing a parser. Competes with no linters; serves as the visual telemetry layer for all of them.
+1. **Git Diff-Scoped Audit Lens (`Diagnostic Lines ∩ Git Modified Lines`):**
+   * **The Problem:** On legacy enterprise files with 40 pre-existing lint warnings, Audit Lens lights up the whole file, collapsing the "5-second scan" promise back into noise.
+   * **The Architecture:** Hook into VS Code's native Git API (`vscode.extensions.getExtension('vscode.git')?.exports`) or compute dirty line ranges via git diff.
+   * **The Filter:** `ActiveRiskLines = DiagnosticsLines.filter(line => gitDiff.isLineModified(line))`.
+   * **The Result:** Pre-existing legacy debt stays dimmed in black; **ONLY** lines introduced by the AI in the current session radiate.
 
-2. **Risk-Scoped Audit Lens (`Cmd + Shift + G`):**
-   * **Mechanism:** Selective dimming by diagnostic severity rather than cursor position.
-   * **Transformation:** Unflagged safe lines drop to **20–25% opacity**; only lines with active errors, warnings, or dirty tags retain **100% luminance**.
-   * **Leverage:** Enables the "8-second scan" of a 500-line AI generation by turning noise pitch-black.
+2. **Semantic Rule-ID Chroma Mapping (Beyond Binary Severity):**
+   * **The Problem:** A missing semicolon and a raw SQL injection or `any` bypass both glow with the same severity color.
+   * **The Architecture:** Inspect `diagnostic.code` and `diagnostic.source` strings using lightweight regex pattern matching:
+     - `@typescript-eslint/no-explicit-any` or `no-any` → **Violet Static Aura (`#BF00FF`)**
+     - `security/*` / `sql` / `eval` / `taint` → **Crimson Threat Hazard (`#FF003C`)**
+     - `unused-vars` / `empty-block` / `empty-catch` → **Toxic Amber Warning (`#FFA600`)**
+     - Formatting / stylistic warnings → Fallback to subtle outline without ambient glow.
 
-3. **Virtual Ghost-Text Badges (Non-Invasive Risk Marking):**
-   * **Mechanism:** Replace file-mutating comment injections (`// [AI:AUDIT]`) with VS Code virtual text decorations (`decorationType.after.contentText`).
-   * **Transformation:** A floating non-invasive `🟠 unhandled catch` or `🔴 untyped any` badge hovers adjacent to the code without dirtying git diffs or file buffers.
-
-4. **Zero-Cost Internal Symbol Resolution (`executeDefinitionProvider`):**
-   * **Mechanism:** Tap the already-running language server via `vscode.commands.executeCommand('vscode.executeDefinitionProvider')`.
-   * **Transformation:** Verifies whether an AI-generated internal function, interface, or module actually resolves to a real symbol.
-   * **Leverage:** Catches hallucinated internal imports and phantom endpoints without any AST dependencies.
+3. **Zero-Cost Internal Symbol Resolution (`executeDefinitionProvider`):**
+   * **The Leverage:** Call `vscode.commands.executeCommand('vscode.executeDefinitionProvider', doc.uri, position)`.
+   * **The Target:** Detect phantom API endpoints and unexported module calls hallucinated by LLMs during multi-file refactors without compiling custom ASTs.
 
 ---
 
@@ -56,7 +55,7 @@
 
 ### C. SKIP / RECONSIDER (High Noise / Low Return)
 
-* **Auto-mutating source files with comment tags:** Modifying user buffers causes git churn and merge conflicts. Replaced by virtual ghost-text decorations.
+* **Auto-mutating source files with comment tags:** Modifying user buffers causes git churn and merge conflicts.
 * **Minimap Heatmaps & Custom AST Engines:** High development overhead, fragile across languages, and redundant with existing editor telemetry.
 * **LLM-Scored Semantic Risk at Runtime:** Adds API cost, network latency, and token overhead to an editor extension that must run at 60 FPS.
 
@@ -64,10 +63,10 @@
 
 ## 2. Sequential Phased Roadmap
 
-| Phase | Target Version | Objective | Status |
+| Phase | Version | Core Deliverables | Status |
 | :--- | :--- | :--- | :--- |
-| **Phase 0** | `v0.1.0` | Production verification on VS Marketplace & Open VSX | **CURRENT** |
-| **Phase 1** | `v0.2.0` | Diagnostics-as-Glow listener (`onDidChangeDiagnostics`) | **QUEUED** |
-| **Phase 2** | `v0.3.0` | Risk-Scoped Audit Lens (`Cmd+Shift+G` severity dimming) | **BACKLOG** |
-| **Phase 3** | `v0.4.0` | Non-invasive Ghost-Text risk badges (`decoration.after`) | **BACKLOG** |
-| **Phase 4** | `v0.5.0` | Language Server internal symbol resolution checker | **BACKLOG** |
+| **Phase 0** | `v0.1.0` | Dual-Marketplace Release (VS Marketplace & Open VSX) | **SHIPPED** |
+| **Phase 1 & 2** | `v0.2.0` | Diagnostics-as-Glow + Risk-Scoped Audit Lens (`Cmd+Shift+G`) | **SHIPPED** |
+| **Phase 3** | `v0.3.0` | **Git Diff-Scoping** (Legacy debt stays dark; only AI diff radiates) | **PLANNED** |
+| **Phase 4** | `v0.4.0` | **Semantic Rule-ID Chroma** (Violet for `any`, Crimson for security) | **BACKLOG** |
+| **Phase 5** | `v0.5.0` | **Internal Symbol Resolver** via `executeDefinitionProvider` | **BACKLOG** |
