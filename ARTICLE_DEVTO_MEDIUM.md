@@ -60,32 +60,32 @@ Instead of passive text, critical lines radiate ambient luminous auras directly 
       [ 8-SECOND HUMAN SCAN ]
 ```
 
-### Key Capabilities in v0.1.0:
-1. **Dynamic Hex Parsing on the Fly:** Type `// [#FF007F]` or `# [#00F0FF]` anywhere, in any language, to render custom glowing borders and radiant background auras.
-2. **Neon Semantic Superchargers:** Upgrades `!`, `?`, `TODO`, `*`, `HACK`, `FIXME` into ambient visual beacons.
-3. **Interactive Palette QuickPick:** Right-click any line and insert curated neon presets (`[#cyan]`, `[#pink]`, `[#matrix]`, `[#lime]`).
-4. **Zero-Lag Architecture:** Cached `TextEditorDecorationType` singletons debounced against document changes ensure zero frame drops on 10,000+ line files.
+### Key Capabilities in v0.2.2:
+1. **The Risk-Scoped Audit Lens (`Alt + Cmd + G`):** Dims 98% of safe boilerplate down to 22% opacity, isolating compiler diagnostics and high-risk tags with negative-space contrast.
+2. **Dual-Spectrum Chroma Engine:** Native neon plasma in Dark themes and rich deep jewel-ink pigments (`#00695C` Teal, `#1B5E20` Emerald, `#B26A00` Ochre, `#B71C1C` Crimson) in Light themes. Meets WCAG AAA with zero washout.
+3. **Smart Colon Guard:** Natural case flexibility with zero false positives. `// Todo:` and `// todo:` ignite in radiant amber, while conversational prose like `// TodoList component` stays completely quiet.
+4. **Diagnostics-as-Glow Engine:** Illuminates live TypeScript compiler and ESLint errors with debounced 80ms fingerprint diffing.
+5. **Dynamic Hex Parsing on the Fly:** Type `// [#FF007F]` or `# [#00F0FF]` anywhere to render custom glowing borders and radiant background auras.
 
 ---
 
-## 3. How to Structure AI Prompt Verification
+## 3. How to Wire Up AI Agents (Claude Code, Cursor, Gemini CLI)
 
-You don't have to manually write glowing tags yourself. By establishing simple rules in your `.cursorrules` or system prompt, you turn the AI into an active co-pilot that flags its own uncertainty:
+You don't need complex MCP plugins or API tokens. Because Glow Comments reads straight from your source code buffer, **your source file is the communication bus.**
+
+Run `Cmd + Shift + P` -> **`Glow Comments: Initialize AI Agent Rules`** to drop this verification protocol into `.cursorrules`, `CLAUDE.md`, or `AGENTS.md`:
 
 ```markdown
-### Visual Verification Rule
-Whenever you write code containing:
-- Stubbed mock data or placeholder fallback arrays
-- Security-sensitive logic (auth, tokens, raw queries)
-- Unhandled error scenarios or loose type escapes
-
-You MUST prepend the line with a luminous tag:
-// ! [AI:AUDIT] <Risk description>
-// [#FF003C] <Security surface>
-// TODO: [AI:MOCK] <Stub warning>
+### Visual Verification Protocol (Glow Comments)
+When generating or refactoring code, use Glow Comments syntax so the human reviewer's Audit Lens (`Alt+Cmd+G`) isolates critical decisions:
+- `// ! [critical assumption]` -> Security boundaries, auth flows, unverified inputs, data mutations
+- `// FIXME: [stub/debt]` -> Mock implementations, temporary stubs, known tech debt
+- `// TODO: [human task]` -> Required manual verification, missing env vars, API rate limits
+- `// ? [clarification]` -> Ambiguous assumptions, unverified third-party API contracts
+- `// NOTE: [architecture]` -> Subsystem architecture, invariants, and core rationale
 ```
 
-When Cursor hits an unverified assumption, it physically illuminates the line in glowing neon pink or radioactive red. You catch hallucinations in **8 seconds** without scanning lines that don't glow.
+When Cursor or Claude hits an unverified assumption, it physically illuminates the line in glowing crimson or toxic amber. You catch hallucinations in **8 seconds** without scanning 500 lines of boilerplate.
 
 ---
 

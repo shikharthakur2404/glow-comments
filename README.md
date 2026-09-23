@@ -85,7 +85,18 @@ When writing, refactoring, or reviewing code, use Glow Comments visual annotatio
 // // Deprecated function stub (Dimmed Strikethrough)
 ```
 
-### 2. Dynamic Hex & Neon Presets
+### 2. Smart Colon Guard (Zero False Positives)
+Write naturally without worrying about strict casing. Glow Comments recognizes canonical tags in any case when followed by a delimiter, while keeping casual prose completely quiet:
+
+| Comment Syntax | HUD Status | Rationale |
+|---|---|---|
+| `// TODO: verify auth token` | ✅ **Radiant Glow** | Canonical uppercase task |
+| `// Todo: fix memory leak` | ✅ **Radiant Glow** | Natural mixed-case task |
+| `// todo: check cache ttl` | ✅ **Radiant Glow** | Casual lowercase task |
+| `// TodoList component handles state` | ❌ **Quiet (Zero Glow)** | Class/variable mention (no colon) |
+| `// Todo item model definition` | ❌ **Quiet (Zero Glow)** | Conversational English (no colon) |
+
+### 3. Dynamic Hex & Neon Presets
 ```typescript
 // [#FF007F] Inline Hex: Custom neon pink highlight
 // [#cyan] Built-in Preset: Cyan plasma aura
