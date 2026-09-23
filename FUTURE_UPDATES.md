@@ -36,6 +36,12 @@
      const hunkRegex = /^@@\s+-(?:\d+)(?:,\d+)?\s+\+(\d+)(?:,(\d+))?\s+@@/gm;
      ```
      Maps `+startLine,lineCount` additions directly into an `O(1)` line-lookup `Set<number>`.
+   * **Edge Cases & Failure Modes (Required Spec):**
+     - **Untracked / New Files Fallback:** Newly generated files have no HEAD/base blob to diff against (`diffWith` fails or returns empty). A naive intersection (`ActiveRiskLines = DiagnosticLines ∩ GitModifiedLines`) would yield an empty set, dimming 100% of newly authored code.
+       * *Resolution:* If a document is untracked or diff execution fails, fall back to treating **100% of document lines as in-scope** (`GitModifiedLines = [0..totalLines - 1]`).
+     - **Zero-Count Deletion Hunk Parsing:** Pure deletion hunks format as `+c,0` (e.g., `@@ -10,4 +15,0 @@`). When the hunk count `d` is explicitly parsed as `0`, exactly 0 lines are added to the modified line set.
+       * *Resolution:* Do NOT treat `0` as an omitted count. In unified diff syntax, an omitted count (`+c`) implies 1 line (`count = 1`), whereas an explicit `,0` implies 0 lines (`count = 0`). Distinguish `d === undefined` from `parseInt(d, 10) === 0`.
+
 
 2. **Semantic Rule-ID Chroma Mapping (Strict Precedence Ordering):**
    * **Precedence Order:** Check threat categories in descending criticality so high-severity patterns aren't swallowed by broad type rules:
