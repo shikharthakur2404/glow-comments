@@ -1,43 +1,67 @@
 import * as vscode from 'vscode';
 
-// Standard high-luminosity neon palette
-const NEON_PRESETS: Record<string, string> = {
-  cyan: '#00F0FF',
-  'neon-cyan': '#00F0FF',
-  pink: '#FF007F',
-  'neon-pink': '#FF007F',
-  magenta: '#FF00A0',
-  green: '#00FFA3',
-  'neon-green': '#00FFA3',
-  lime: '#76FF03',
-  purple: '#BD00FF',
-  'neon-purple': '#BD00FF',
-  violet: '#D500F9',
-  yellow: '#FFE600',
-  'neon-yellow': '#FFE600',
-  gold: '#FFD700',
-  orange: '#FF7700',
-  'neon-orange': '#FF7700',
-  red: '#FF2A2A',
-  'neon-red': '#FF2A2A',
-  blue: '#0091FF',
-  'neon-blue': '#0091FF',
-  white: '#FFFFFF',
-  matrix: '#00FF66',
-  cyberpunk: '#FFE600'
+// Dual-Spectrum Chroma: Dark mode neon emitters & Light mode rich jewel inks (WCAG AAA >= 4.5:1)
+interface DualColor {
+  dark: string;
+  light: string;
+}
+
+const DUAL_NEON_PRESETS: Record<string, DualColor> = {
+  cyan: { dark: '#00F0FF', light: '#00695C' },
+  'neon-cyan': { dark: '#00F0FF', light: '#00695C' },
+  pink: { dark: '#FF007F', light: '#C2185B' },
+  'neon-pink': { dark: '#FF007F', light: '#C2185B' },
+  magenta: { dark: '#FF00A0', light: '#880E4F' },
+  green: { dark: '#00FFA3', light: '#1B5E20' },
+  'neon-green': { dark: '#00FFA3', light: '#1B5E20' },
+  lime: { dark: '#76FF03', light: '#2E7D32' },
+  purple: { dark: '#BD00FF', light: '#4A148C' },
+  'neon-purple': { dark: '#BD00FF', light: '#4A148C' },
+  violet: { dark: '#D500F9', light: '#6A1B9A' },
+  yellow: { dark: '#FFE600', light: '#E65100' },
+  'neon-yellow': { dark: '#FFE600', light: '#E65100' },
+  gold: { dark: '#FFD700', light: '#BF360C' },
+  orange: { dark: '#FF7700', light: '#D84315' },
+  'neon-orange': { dark: '#FF7700', light: '#D84315' },
+  red: { dark: '#FF2A2A', light: '#B71C1C' },
+  'neon-red': { dark: '#FF2A2A', light: '#B71C1C' },
+  blue: { dark: '#0091FF', light: '#0D47A1' },
+  'neon-blue': { dark: '#0091FF', light: '#0D47A1' },
+  white: { dark: '#FFFFFF', light: '#212121' },
+  matrix: { dark: '#00FF66', light: '#1B5E20' },
+  cyberpunk: { dark: '#FFE600', light: '#E65100' }
 };
 
-// Semantic shortcuts compatible with legacy workflow + glow upgrade
-const SEMANTIC_TAGS: Record<string, { color: string; strike?: boolean; isRisk?: boolean }> = {
-  '!': { color: '#FF2A4B', isRisk: true },        // Alert / Critical Red
-  '?': { color: '#00C8FF' },                      // Question / Exploration Blue
-  TODO: { color: '#FFA600', isRisk: true },       // Task / Action Gold
-  '*': { color: '#00FFA3' },                      // Highlight / Focus Green
-  HACK: { color: '#BD00FF', isRisk: true },       // Tech Debt Purple
-  FIXME: { color: '#FF5500', isRisk: true },      // Urgent Bug Orange
-  NOTE: { color: '#00F0FF' },                     // System Note Cyan
-  '//': { color: '#6272A4', strike: true }        // Strikethrough / Deprecated
+// Semantic shortcuts: High contrast in both dark & light viewports
+const DUAL_SEMANTIC_TAGS: Record<string, { dark: string; light: string; strike?: boolean; isRisk?: boolean }> = {
+  '!': { dark: '#FF2A4B', light: '#C62828', isRisk: true },        // Alert Red
+  '?': { dark: '#00C8FF', light: '#0D47A1' },                      // Question Blue
+  TODO: { dark: '#FFA600', light: '#B26A00', isRisk: true },       // Task Gold/Amber
+  '*': { dark: '#00FFA3', light: '#1B5E20' },                      // Highlight Green
+  HACK: { dark: '#BD00FF', light: '#4A148C', isRisk: true },       // Tech Debt Purple
+  FIXME: { dark: '#FF5500', light: '#D84315', isRisk: true },      // Urgent Bug Orange
+  NOTE: { dark: '#00F0FF', light: '#00695C' },                     // System Note Teal
+  '//': { dark: '#6272A4', light: '#78909C', strike: true }        // Strikethrough Muted Slate
 };
+
+function getLightModeVariant(hex: string): string {
+  let c = hex.replace(/^#/, '');
+  if (c.length === 3) c = c.split('').map(x => x + x).join('');
+  if (c.length !== 6) return hex;
+  const r = parseInt(c.slice(0, 2), 16);
+  const g = parseInt(c.slice(2, 4), 16);
+  const b = parseInt(c.slice(4, 6), 16);
+  const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+  // If color is too luminous for white background, synthesize deep ink tone
+  if (lum > 130) {
+    const factor = 0.42;
+    const dr = Math.floor(r * factor).toString(16).padStart(2, '0');
+    const dg = Math.floor(g * factor).toString(16).padStart(2, '0');
+    const db = Math.floor(b * factor).toString(16).padStart(2, '0');
+    return `#${dr}${dg}${db}`;
+  }
+  return hex;
+}
 
 export function activate(context: vscode.ExtensionContext) {
   // Caches & States
@@ -48,8 +72,14 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Audit Lens state
   let isAuditLensActive = false;
+  let commentRiskLines = new Set<number>();
+  let diagRiskLines = new Set<number>();
   let currentFlaggedLines = new Set<number>();
   let lastDiagnosticFingerprint = '';
+
+  function syncCurrentFlaggedLines() {
+    currentFlaggedLines = new Set([...commentRiskLines, ...diagRiskLines]);
+  }
 
   // Dedicated singletons for Diagnostics & Lens to prevent cache churn
   let diagErrorDecoration: vscode.TextEditorDecorationType | undefined;
@@ -80,29 +110,52 @@ export function activate(context: vscode.ExtensionContext) {
     auditDimDecoration?.dispose();
     untaggedCommentDecoration?.dispose();
 
-    // 1. Diagnostic Error Decoration: Radiant Crimson Neon
+    // 1. Diagnostic Error: Radiant Crimson (Dark) / Deep Ruby (Light)
     diagErrorDecoration = vscode.window.createTextEditorDecorationType({
-      backgroundColor: `#FF1744${getHexAlpha(glowOpacity * 1.1)}`,
-      border: `1px solid #FF1744${getHexAlpha(0.4)}`,
-      borderRadius: '3px',
-      overviewRulerColor: '#FF1744',
-      overviewRulerLane: vscode.OverviewRulerLane.Right
+      overviewRulerLane: vscode.OverviewRulerLane.Right,
+      dark: {
+        backgroundColor: `#FF1744${getHexAlpha(glowOpacity * 1.1)}`,
+        border: `1px solid #FF1744${getHexAlpha(0.4)}`,
+        borderRadius: '3px',
+        overviewRulerColor: '#FF1744'
+      },
+      light: {
+        backgroundColor: `#B71C1C${getHexAlpha(glowOpacity * 0.8)}`,
+        border: `1px solid #B71C1C${getHexAlpha(0.45)}`,
+        borderRadius: '3px',
+        overviewRulerColor: '#B71C1C'
+      }
     });
 
-    // 2. Diagnostic Warning Decoration: Toxic Amber Neon
+    // 2. Diagnostic Warning: Toxic Amber (Dark) / Burnt Ochre (Light)
     diagWarnDecoration = vscode.window.createTextEditorDecorationType({
-      backgroundColor: `#FFA600${getHexAlpha(glowOpacity * 0.95)}`,
-      border: `1px solid #FFA600${getHexAlpha(0.35)}`,
-      borderRadius: '3px',
-      overviewRulerColor: '#FFA600',
-      overviewRulerLane: vscode.OverviewRulerLane.Right
+      overviewRulerLane: vscode.OverviewRulerLane.Right,
+      dark: {
+        backgroundColor: `#FFA600${getHexAlpha(glowOpacity * 0.95)}`,
+        border: `1px solid #FFA600${getHexAlpha(0.35)}`,
+        borderRadius: '3px',
+        overviewRulerColor: '#FFA600'
+      },
+      light: {
+        backgroundColor: `#B26A00${getHexAlpha(glowOpacity * 0.75)}`,
+        border: `1px solid #B26A00${getHexAlpha(0.40)}`,
+        borderRadius: '3px',
+        overviewRulerColor: '#B26A00'
+      }
     });
 
-    // 3. Diagnostic Info Decoration: Cyber Cyan
+    // 3. Diagnostic Info: Cyber Cyan (Dark) / Deep Pine (Light)
     diagInfoDecoration = vscode.window.createTextEditorDecorationType({
-      backgroundColor: `#00F0FF${getHexAlpha(glowOpacity * 0.7)}`,
-      border: `1px solid #00F0FF${getHexAlpha(0.25)}`,
-      borderRadius: '3px'
+      dark: {
+        backgroundColor: `#00F0FF${getHexAlpha(glowOpacity * 0.7)}`,
+        border: `1px solid #00F0FF${getHexAlpha(0.25)}`,
+        borderRadius: '3px'
+      },
+      light: {
+        backgroundColor: `#00695C${getHexAlpha(glowOpacity * 0.6)}`,
+        border: `1px solid #00695C${getHexAlpha(0.35)}`,
+        borderRadius: '3px'
+      }
     });
 
     // 4. Audit Lens Dimming Decoration: Drops non-flagged code to dimOpacity
@@ -112,40 +165,51 @@ export function activate(context: vscode.ExtensionContext) {
 
     // 5. Untagged Comment Decoration: Ultra-subtle (disabled by default)
     untaggedCommentDecoration = vscode.window.createTextEditorDecorationType({
-      backgroundColor: `#6272A4${getHexAlpha(0.04)}`,
-      fontStyle: 'italic'
+      fontStyle: 'italic',
+      dark: {
+        backgroundColor: `#6272A4${getHexAlpha(0.04)}`
+      },
+      light: {
+        backgroundColor: `#37474F${getHexAlpha(0.05)}`
+      }
     });
   }
 
   initStaticDecorations();
 
-  function getCommentDecorationType(hex: string, strikethrough: boolean = false): vscode.TextEditorDecorationType {
+  function getCommentDecorationType(
+    darkHex: string,
+    lightHex: string,
+    strikethrough: boolean = false
+  ): vscode.TextEditorDecorationType {
     const config = vscode.workspace.getConfiguration('glowComments');
     const enableGlow = config.get<boolean>('enableGlow', true);
     const glowOpacity = config.get<number>('glowOpacity', 0.14);
     const enableBorder = config.get<boolean>('enableBorder', true);
     const isBold = config.get<boolean>('bold', true);
 
-    const cacheKey = `${hex.toUpperCase()}_glow:${enableGlow}_strike:${strikethrough}_border:${enableBorder}_bold:${isBold}`;
+    const cacheKey = `${darkHex.toUpperCase()}_${lightHex.toUpperCase()}_glow:${enableGlow}_strike:${strikethrough}_border:${enableBorder}_bold:${isBold}`;
 
     if (commentDecorationCache.has(cacheKey)) {
       return commentDecorationCache.get(cacheKey)!;
     }
 
     const renderOptions: vscode.DecorationRenderOptions = {
-      color: hex,
       fontWeight: isBold ? 'bold' : 'normal',
-      textDecoration: strikethrough ? 'line-through' : undefined
+      textDecoration: strikethrough ? 'line-through' : undefined,
+      dark: {
+        color: darkHex,
+        backgroundColor: enableGlow ? `${darkHex}${getHexAlpha(glowOpacity)}` : undefined,
+        border: (enableBorder && enableGlow) ? `1px solid ${darkHex}${getHexAlpha(0.35)}` : undefined,
+        borderRadius: '3px'
+      },
+      light: {
+        color: lightHex,
+        backgroundColor: enableGlow ? `${lightHex}${getHexAlpha(glowOpacity * 0.85)}` : undefined,
+        border: (enableBorder && enableGlow) ? `1px solid ${lightHex}${getHexAlpha(0.40)}` : undefined,
+        borderRadius: '3px'
+      }
     };
-
-    if (enableGlow) {
-      renderOptions.backgroundColor = `${hex}${getHexAlpha(glowOpacity)}`;
-      renderOptions.borderRadius = '3px';
-    }
-
-    if (enableBorder && enableGlow) {
-      renderOptions.border = `1px solid ${hex}${getHexAlpha(0.35)}`;
-    }
 
     const dec = vscode.window.createTextEditorDecorationType(renderOptions);
     commentDecorationCache.set(cacheKey, dec);
@@ -178,12 +242,12 @@ export function activate(context: vscode.ExtensionContext) {
     const text = doc.getText();
     const config = vscode.workspace.getConfiguration('glowComments');
     const customPresets = config.get<Record<string, string>>('customPresets', {});
-    const combinedPresets = { ...NEON_PRESETS, ...customPresets };
     const glowUntagged = config.get<boolean>('glowUntaggedComments', false);
 
     const rangeBuckets = new Map<vscode.TextEditorDecorationType, vscode.Range[]>();
     const untaggedRanges: vscode.Range[] = [];
     const flaggedCommentLines = new Set<number>();
+    const newCommentRiskLines = new Set<number>();
 
     const getBucket = (dec: vscode.TextEditorDecorationType): vscode.Range[] => {
       let bucket = rangeBuckets.get(dec);
@@ -204,7 +268,8 @@ export function activate(context: vscode.ExtensionContext) {
       if (!commentContent) continue;
 
       const trimmed = commentContent.trim();
-      let matchedHex: string | null = null;
+      let matchedDarkHex: string | null = null;
+      let matchedLightHex: string | null = null;
       let isStrike = false;
       let isRisk = false;
 
@@ -215,28 +280,34 @@ export function activate(context: vscode.ExtensionContext) {
         if (rawHex.length === 3) {
           rawHex = rawHex.split('').map(c => c + c).join('');
         }
-        matchedHex = `#${rawHex}`;
+        matchedDarkHex = `#${rawHex}`;
+        matchedLightHex = getLightModeVariant(matchedDarkHex);
       }
 
       // Pattern 2: Named neon preset tag [#cyan], [cyan], or @glow(cyan)
-      if (!matchedHex) {
+      if (!matchedDarkHex) {
         const namedMatch = trimmed.match(/^\[#?([a-zA-Z0-9_-]+)\]/i) || trimmed.match(/^@glow\(([a-zA-Z0-9_-]+)\)/i);
         if (namedMatch) {
           const tagName = namedMatch[1].toLowerCase();
-          if (combinedPresets[tagName]) {
-            matchedHex = combinedPresets[tagName];
+          if (DUAL_NEON_PRESETS[tagName]) {
+            matchedDarkHex = DUAL_NEON_PRESETS[tagName].dark;
+            matchedLightHex = DUAL_NEON_PRESETS[tagName].light;
+          } else if (customPresets[tagName]) {
+            matchedDarkHex = customPresets[tagName];
+            matchedLightHex = getLightModeVariant(matchedDarkHex);
           }
         }
       }
 
       // Pattern 3: Semantic shortcuts (!, ?, TODO, *, HACK, FIXME, NOTE, //)
-      if (!matchedHex) {
-        for (const [prefix, def] of Object.entries(SEMANTIC_TAGS)) {
+      if (!matchedDarkHex) {
+        for (const [prefix, def] of Object.entries(DUAL_SEMANTIC_TAGS)) {
           if (prefix === '*' && (delimiter === '/*' || delimiter === '<!--')) {
             continue;
           }
           if (trimmed.startsWith(prefix) || trimmed.startsWith(`[${prefix}]`)) {
-            matchedHex = def.color;
+            matchedDarkHex = def.dark;
+            matchedLightHex = def.light;
             isStrike = !!def.strike;
             isRisk = !!def.isRisk;
             break;
@@ -248,12 +319,12 @@ export function activate(context: vscode.ExtensionContext) {
       const endPos = doc.positionAt(match.index + match[0].length);
       const range = new vscode.Range(startPos, endPos);
 
-      if (matchedHex) {
-        const decType = getCommentDecorationType(matchedHex, isStrike);
+      if (matchedDarkHex && matchedLightHex) {
+        const decType = getCommentDecorationType(matchedDarkHex, matchedLightHex, isStrike);
         getBucket(decType).push(range);
         flaggedCommentLines.add(startPos.line);
         if (isRisk) {
-          currentFlaggedLines.add(startPos.line);
+          newCommentRiskLines.add(startPos.line);
         }
       } else if (glowUntagged && untaggedCommentDecoration) {
         untaggedRanges.push(range);
@@ -269,6 +340,9 @@ export function activate(context: vscode.ExtensionContext) {
     if (untaggedCommentDecoration) {
       activeEditor.setDecorations(untaggedCommentDecoration, untaggedRanges);
     }
+
+    commentRiskLines = newCommentRiskLines;
+    syncCurrentFlaggedLines();
 
     if (isAuditLensActive) {
       applyAuditLens();
@@ -338,21 +412,22 @@ export function activate(context: vscode.ExtensionContext) {
     activeEditor.setDecorations(diagWarnDecoration, warnRanges);
     activeEditor.setDecorations(diagInfoDecoration, infoRanges);
 
-    currentFlaggedLines = diagFlaggedLines;
+    diagRiskLines = diagFlaggedLines;
+    syncCurrentFlaggedLines();
 
     if (isAuditLensActive) {
       applyAuditLens();
     }
   }
 
-  // --- ENGINE 3: RISK-SCOPED AUDIT LENS (Cmd + Shift + G) ---
+  // --- ENGINE 3: RISK-SCOPED AUDIT LENS (Alt + Cmd + G / Alt + Ctrl + G) ---
   function applyAuditLens() {
     if (!activeEditor || !auditDimDecoration) return;
 
     if (!isAuditLensActive) {
       activeEditor.setDecorations(auditDimDecoration, []);
       auditLensStatusBar.text = '$(eye-closed) Audit Lens: OFF';
-      auditLensStatusBar.tooltip = 'Click to toggle Risk Audit Lens (Cmd+Shift+G)';
+      auditLensStatusBar.tooltip = 'Click to toggle Risk Audit Lens (Alt+Cmd+G / Alt+Win+G)';
       auditLensStatusBar.show();
       return;
     }
@@ -420,6 +495,25 @@ export function activate(context: vscode.ExtensionContext) {
     }
   }, null, context.subscriptions);
 
+  vscode.window.onDidChangeActiveColorTheme(() => {
+    clearCommentDecorations();
+    initStaticDecorations();
+    lastDiagnosticFingerprint = '';
+    triggerUpdateComments(false);
+    triggerUpdateDiagnostics();
+  }, null, context.subscriptions);
+
+  // --- AI AGENT DIRECTIVE PROTOCOL (Path A) ---
+  const AGENT_DIRECTIVE_BLOCK = `
+# Glow Comments: Visual Verification Protocol
+When generating, refactoring, or reviewing code, use Glow Comments visual annotations so the developer's Audit Lens (\`Alt+Cmd+G\` / \`Alt+Ctrl+G\`) instantly surfaces critical logic:
+- \`// ! [critical assumption]\` -> High-risk boundaries, auth flows, unverified inputs, data mutations.
+- \`// FIXME: [stub/debt]\` -> Mock implementations, temporary stubs, or performance bottlenecks.
+- \`// TODO: [human task]\` -> Required human review, missing API credentials, rate limits, env configs.
+- \`// ? [clarification]\` -> Ambiguous requirements, unverified external API contracts, design tradeoffs.
+- \`// NOTE: [architecture]\` -> Core subsystem invariants and architectural boundaries.
+`.trim();
+
   // --- COMMANDS ---
   const insertTagCmd = vscode.commands.registerCommand('glowComments.insertTag', async () => {
     const paletteItems = [
@@ -471,7 +565,72 @@ export function activate(context: vscode.ExtensionContext) {
     toggleAuditLens();
   });
 
-  context.subscriptions.push(insertTagCmd, toggleGlowCmd, toggleAuditLensCmd);
+  const initAgentRulesCmd = vscode.commands.registerCommand('glowComments.initAgentRules', async () => {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+      vscode.window.showErrorMessage('Glow Comments: Open a workspace folder first to initialize agent rules.');
+      return;
+    }
+
+    const rootUri = workspaceFolders[0].uri;
+    const targetOptions = [
+      { label: '$(file-code) All Agent Files (.cursorrules, CLAUDE.md, AGENTS.md)', files: ['.cursorrules', 'CLAUDE.md', 'AGENTS.md'] },
+      { label: '$(file-code) .cursorrules (Cursor IDE Agent)', files: ['.cursorrules'] },
+      { label: '$(file-code) CLAUDE.md (Claude Code CLI / Anthropic)', files: ['CLAUDE.md'] },
+      { label: '$(file-code) AGENTS.md (OpenCode / Codex / Universal Agents)', files: ['AGENTS.md'] },
+      { label: '$(clippy) Copy Protocol to Clipboard Only', files: [] }
+    ];
+
+    const pick = await vscode.window.showQuickPick(targetOptions, {
+      placeHolder: 'Select where to install Glow Comments Visual Verification Protocol'
+    });
+
+    if (!pick) return;
+
+    if (pick.files.length === 0) {
+      await vscode.env.clipboard.writeText(AGENT_DIRECTIVE_BLOCK);
+      vscode.window.showInformationMessage('Glow Comments: Agent verification protocol copied to clipboard.');
+      return;
+    }
+
+    const written: string[] = [];
+    for (const filename of pick.files) {
+      const fileUri = vscode.Uri.joinPath(rootUri, filename);
+      let content = AGENT_DIRECTIVE_BLOCK;
+      try {
+        const existingData = await vscode.workspace.fs.readFile(fileUri);
+        const existingText = Buffer.from(existingData).toString('utf8');
+        if (existingText.includes('Glow Comments: Visual Verification Protocol')) {
+          continue;
+        }
+        content = `${existingText.trim()}\n\n${AGENT_DIRECTIVE_BLOCK}\n`;
+      } catch {
+        content = `${AGENT_DIRECTIVE_BLOCK}\n`;
+      }
+
+      await vscode.workspace.fs.writeFile(fileUri, Buffer.from(content, 'utf8'));
+      written.push(filename);
+    }
+
+    if (written.length > 0) {
+      vscode.window.showInformationMessage(`Glow Comments: Installed AI agent rules in ${written.join(', ')}`);
+    } else {
+      vscode.window.showInformationMessage('Glow Comments: Agent rules were already present in target file(s).');
+    }
+  });
+
+  const copyAgentRuleCmd = vscode.commands.registerCommand('glowComments.copyAgentRule', async () => {
+    await vscode.env.clipboard.writeText(AGENT_DIRECTIVE_BLOCK);
+    vscode.window.showInformationMessage('Glow Comments: AI agent verification protocol copied to clipboard!');
+  });
+
+  context.subscriptions.push(
+    insertTagCmd,
+    toggleGlowCmd,
+    toggleAuditLensCmd,
+    initAgentRulesCmd,
+    copyAgentRuleCmd
+  );
 
   // Initial pass on activation
   if (activeEditor) {

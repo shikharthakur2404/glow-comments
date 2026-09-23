@@ -1,8 +1,8 @@
 {
   "name": "glow-comments",
   "displayName": "Glow Comments",
-  "description": "High-visibility neon glowing comments, dynamic inline hex colors, and modern semantic code annotations.",
-  "version": "0.2.0",
+  "description": "Cognitive verification HUD for AI code. Dual-spectrum neon annotations, live linter diagnostics glow, and Audit Lens for Claude Code, Cursor, and Gemini.",
+  "version": "0.2.1",
   "publisher": "shikharthakur",
   "repository": {
     "type": "git",
@@ -12,21 +12,25 @@
     "vscode": "^1.80.0"
   },
   "categories": [
-    "Themes",
     "Programming Languages",
-    "Other"
+    "Other",
+    "Themes"
   ],
   "keywords": [
+    "ai",
+    "vibe-coding",
+    "claude-code",
+    "gemini-cli",
+    "cursor",
+    "audit-lens",
+    "diagnostics",
     "comments",
     "glow",
     "neon",
     "better comments",
     "annotations",
     "todo",
-    "highlight",
-    "cyberpunk",
-    "diagnostics",
-    "audit"
+    "highlight"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -45,13 +49,21 @@
       {
         "command": "glowComments.toggleAuditLens",
         "title": "Glow Comments: Toggle Risk Audit Lens"
+      },
+      {
+        "command": "glowComments.initAgentRules",
+        "title": "Glow Comments: Initialize AI Agent Rules (CLAUDE.md / .cursorrules / AGENTS.md)"
+      },
+      {
+        "command": "glowComments.copyAgentRule",
+        "title": "Glow Comments: Copy AI Agent Directive to Clipboard"
       }
     ],
     "keybindings": [
       {
         "command": "glowComments.toggleAuditLens",
         "key": "alt+cmd+g",
-        "mac": "cmd+shift+g",
+        "mac": "alt+cmd+g",
         "when": "editorTextFocus"
       }
     ],
