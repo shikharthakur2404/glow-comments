@@ -1,6 +1,6 @@
 {
   "name": "glow-comments",
-  "displayName": "Glow Comments",
+  "displayName": "Glow Comments — AI Code Review & Audit Lens",
   "description": "Cognitive verification HUD for AI code. Dual-spectrum neon annotations, live linter diagnostics glow, and Audit Lens for Claude Code, Cursor, and Gemini.",
   "version": "0.2.3",
   "publisher": "shikharthakur",
