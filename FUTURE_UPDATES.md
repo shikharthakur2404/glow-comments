@@ -17,27 +17,32 @@
                            │
            ┌───────────────┴───────────────┐
            ▼                               ▼
- [ Semantic Rule-ID Chroma ]     [ Git Diff-Scoped Lens ]
-  (any: violet, sec: crimson)      (Isolates newly added risk)
+ [ Semantic Rule-ID Chroma ]     [ Session Anchor Diff Lens ]
+  (Sec > Type > Stylistic)        (Survives intermediate commits)
 ```
 
 ---
 
 ### A. NEXT PRIORITY (v0.3.0): The Signal-to-Noise Hardening
 
-1. **Git Diff-Scoped Audit Lens (`Diagnostic Lines ∩ Git Modified Lines`):**
-   * **The Problem:** On legacy enterprise files with 40 pre-existing lint warnings, Audit Lens lights up the whole file, collapsing the "5-second scan" promise back into noise.
-   * **The Architecture:** Hook into VS Code's native Git API (`vscode.extensions.getExtension('vscode.git')?.exports`) or compute dirty line ranges via git diff.
-   * **The Filter:** `ActiveRiskLines = DiagnosticsLines.filter(line => gitDiff.isLineModified(line))`.
-   * **The Result:** Pre-existing legacy debt stays dimmed in black; **ONLY** lines introduced by the AI in the current session radiate.
+1. **Session-Anchored Git Diff-Scoping:**
+   * **The HEAD Failure Mode:** Diffing against `HEAD` means the moment an engineer commits (`git commit`), `diffWithHEAD` drops to empty and the freshly written AI code goes pitch black.
+   * **The Solution (Session Anchor):** Capture `sessionAnchorCommit` when the extension activates or when Audit Lens is toggled. Diff against this anchor commit so changes survive intermediate commits.
+   * **Config Vector:**
+     - `glowComments.diffScopeBase`: `"session"` (default) | `"head"` (working tree) | `"main"` (branch divergence).
+   * **The Hunk Parser:** `vscode.git` returns raw unified diff strings, not structured line numbers. Implement a zero-dependency hunk header parser:
+     ```typescript
+     // Regex: @@ -a,b +c,d @@
+     const hunkRegex = /^@@\s+-(?:\d+)(?:,\d+)?\s+\+(\d+)(?:,(\d+))?\s+@@/gm;
+     ```
+     Maps `+startLine,lineCount` additions directly into an `O(1)` line-lookup `Set<number>`.
 
-2. **Semantic Rule-ID Chroma Mapping (Beyond Binary Severity):**
-   * **The Problem:** A missing semicolon and a raw SQL injection or `any` bypass both glow with the same severity color.
-   * **The Architecture:** Inspect `diagnostic.code` and `diagnostic.source` strings using lightweight regex pattern matching:
-     - `@typescript-eslint/no-explicit-any` or `no-any` → **Violet Static Aura (`#BF00FF`)**
-     - `security/*` / `sql` / `eval` / `taint` → **Crimson Threat Hazard (`#FF003C`)**
-     - `unused-vars` / `empty-block` / `empty-catch` → **Toxic Amber Warning (`#FFA600`)**
-     - Formatting / stylistic warnings → Fallback to subtle outline without ambient glow.
+2. **Semantic Rule-ID Chroma Mapping (Strict Precedence Ordering):**
+   * **Precedence Order:** Check threat categories in descending criticality so high-severity patterns aren't swallowed by broad type rules:
+     1. **Tier 1 (Crimson Threat `#FF003C`):** `security/*`, `sql`, `eval`, `injection`, `taint`, `prototype-pollution`.
+     2. **Tier 2 (Violet Static `#BF00FF`):** `no-explicit-any`, `no-unsafe-*`, `loose-cast`.
+     3. **Tier 3 (Toxic Amber `#FFA600`):** `empty-catch`, `no-empty`, `unhandled-rejection`.
+     4. **Tier 4 (Outline Only / No Glow):** Formatting, stylistic rules (semicolons, spacing, quotes) downgraded to subtle muted outlines to prevent visual pollution.
 
 3. **Zero-Cost Internal Symbol Resolution (`executeDefinitionProvider`):**
    * **The Leverage:** Call `vscode.commands.executeCommand('vscode.executeDefinitionProvider', doc.uri, position)`.
@@ -67,6 +72,6 @@
 | :--- | :--- | :--- | :--- |
 | **Phase 0** | `v0.1.0` | Dual-Marketplace Release (VS Marketplace & Open VSX) | **SHIPPED** |
 | **Phase 1 & 2** | `v0.2.0` | Diagnostics-as-Glow + Risk-Scoped Audit Lens (`Cmd+Shift+G`) | **SHIPPED** |
-| **Phase 3** | `v0.3.0` | **Git Diff-Scoping** (Legacy debt stays dark; only AI diff radiates) | **PLANNED** |
-| **Phase 4** | `v0.4.0` | **Semantic Rule-ID Chroma** (Violet for `any`, Crimson for security) | **BACKLOG** |
+| **Phase 3** | `v0.3.0` | **Session-Anchored Diff-Scoping** + Hunk Parser (`sessionAnchorCommit`) | **PLANNED** |
+| **Phase 4** | `v0.4.0` | **Semantic Rule-ID Chroma** (Strict Security > Type > Stylistic precedence) | **BACKLOG** |
 | **Phase 5** | `v0.5.0` | **Internal Symbol Resolver** via `executeDefinitionProvider` | **BACKLOG** |
