@@ -2,7 +2,7 @@
   "name": "glow-comments",
   "displayName": "Glow Comments",
   "description": "Cognitive verification HUD for AI code. Dual-spectrum neon annotations, live linter diagnostics glow, and Audit Lens for Claude Code, Cursor, and Gemini.",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "publisher": "shikharthakur",
   "repository": {
     "type": "git",
@@ -62,8 +62,8 @@
     "keybindings": [
       {
         "command": "glowComments.toggleAuditLens",
-        "key": "alt+cmd+g",
-        "mac": "alt+cmd+g",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+k cmd+g",
         "when": "editorTextFocus"
       }
     ],

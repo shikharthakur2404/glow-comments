@@ -440,7 +440,7 @@ export function activate(context: vscode.ExtensionContext) {
     if (!isAuditLensActive) {
       activeEditor.setDecorations(auditDimDecoration, []);
       auditLensStatusBar.text = '$(eye-closed) Audit Lens: OFF';
-      auditLensStatusBar.tooltip = 'Click to toggle Risk Audit Lens (Alt+Cmd+G / Alt+Win+G)';
+      auditLensStatusBar.tooltip = 'Click to toggle Risk Audit Lens (Cmd+K Cmd+G / Ctrl+Alt+G)';
       auditLensStatusBar.show();
       return;
     }
@@ -519,7 +519,7 @@ export function activate(context: vscode.ExtensionContext) {
   // --- AI AGENT DIRECTIVE PROTOCOL (Path A) ---
   const AGENT_DIRECTIVE_BLOCK = `
 # Glow Comments: Visual Verification Protocol
-When generating, refactoring, or reviewing code, use Glow Comments visual annotations so the developer's Audit Lens (\`Alt+Cmd+G\` / \`Alt+Ctrl+G\`) instantly surfaces critical logic:
+When generating, refactoring, or reviewing code, use Glow Comments visual annotations so the developer's Audit Lens (\`Cmd+K Cmd+G\` / \`Ctrl+Alt+G\`) instantly surfaces critical logic:
 - \`// ! [critical assumption]\` -> High-risk boundaries, auth flows, unverified inputs, data mutations.
 - \`// FIXME: [stub/debt]\` -> Mock implementations, temporary stubs, or performance bottlenecks.
 - \`// TODO: [human task]\` -> Required human review, missing API credentials, rate limits, env configs.

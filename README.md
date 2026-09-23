@@ -10,7 +10,7 @@ Eliminate **AI Code Blindness** and lower the **Cognitive Verification Tax**. Wh
 
 ## ✨ Core Superpowers
 
-### 1. 🔍 The Risk Audit Lens (`Alt + Cmd + G` / `Alt + Ctrl + G`)
+### 1. 🔍 The Risk Audit Lens (`Cmd + K, Cmd + G` / `Ctrl + Alt + G`)
 - **Negative Space Verification:** Instantly dims 98% of safe boilerplate down to **22% opacity**.
 - **Radiant Isolation:** Active compiler/linter diagnostics and critical tags (`!`, `FIXME`, `HACK`, `TODO`) remain at **100% full radiance**.
 - **Status Bar HUD:** Real-time indicator displaying `$(eye) Audit Lens: ON (N flagged)`.
@@ -36,7 +36,7 @@ Eliminate **AI Code Blindness** and lower the **Cognitive Verification Tax**. Wh
 ## ⚡ Quickstart: How to Use (in 60 Seconds)
 
 1. **Tag Critical Lines:** Prefix any comment with `// !`, `// TODO:`, `// FIXME:`, or custom hex `// [#cyan]`.
-2. **Engage the Audit Lens:** Press **`Alt + Cmd + G`** (`Alt + Ctrl + G` on Windows/Linux).
+2. **Engage the Audit Lens:** Press **`Cmd + K, Cmd + G`** (`Ctrl + Alt + G` on Windows/Linux).
    - Safe code dims to **22% opacity**.
    - Your risk tags and compiler errors blaze at **100% full radiance**.
 3. **Check the Status Bar:** The bottom-right HUD displays `$(eye) Audit Lens: ON (N flagged)`. Click it anytime to toggle.
@@ -61,7 +61,7 @@ Paste this into your project's `.cursorrules`, `CLAUDE.md`, `AGENTS.md`, or dire
 
 ```markdown
 ### Visual Verification Protocol (Glow Comments)
-When writing, refactoring, or reviewing code, use Glow Comments visual annotations so the human reviewer's Audit Lens (\`Alt+Cmd+G\` / \`Alt+Ctrl+G\`) instantly surfaces critical logic:
+When writing, refactoring, or reviewing code, use Glow Comments visual annotations so the human reviewer's Audit Lens (\`Cmd+K Cmd+G\` / \`Ctrl+Alt+G\`) instantly surfaces critical logic:
 - \`// ! [critical assumption]\` -> High-risk boundaries, auth flows, unverified inputs, data mutations.
 - \`// FIXME: [stub/debt]\` -> Mock implementations, temporary stubs, or performance bottlenecks.
 - \`// TODO: [human task]\` -> Required human review, missing API credentials, rate limits, env configs.
@@ -140,7 +140,7 @@ Open your `settings.json` (`Cmd + ,` or `Ctrl + ,`):
 
 | Shortcut | Command | Description |
 |---|---|---|
-| `Alt + Cmd + G` | `glowComments.toggleAuditLens` | **Toggle Risk Audit Lens** (dims non-flagged code) |
+| `Cmd + K, Cmd + G` / `Ctrl + Alt + G` | `glowComments.toggleAuditLens` | **Toggle Risk Audit Lens** (dims non-flagged code) |
 | — | `glowComments.initAgentRules` | **Initialize AI Agent Rules** (`.cursorrules`, `CLAUDE.md`, `AGENTS.md`) |
 | — | `glowComments.copyAgentRule` | **Copy AI Agent Protocol** to clipboard |
 | — | `glowComments.insertTag` | **Insert Color Tag** via interactive palette |

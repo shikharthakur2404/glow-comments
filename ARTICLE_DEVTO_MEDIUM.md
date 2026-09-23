@@ -77,7 +77,7 @@ Run `Cmd + Shift + P` -> **`Glow Comments: Initialize AI Agent Rules`** to drop 
 
 ```markdown
 ### Visual Verification Protocol (Glow Comments)
-When generating or refactoring code, use Glow Comments syntax so the human reviewer's Audit Lens (`Alt+Cmd+G`) isolates critical decisions:
+When generating or refactoring code, use Glow Comments syntax so the human reviewer's Audit Lens (`Cmd+K Cmd+G` / `Ctrl+Alt+G`) isolates critical decisions:
 - `// ! [critical assumption]` -> Security boundaries, auth flows, unverified inputs, data mutations
 - `// FIXME: [stub/debt]` -> Mock implementations, temporary stubs, known tech debt
 - `// TODO: [human task]` -> Required manual verification, missing env vars, API rate limits
