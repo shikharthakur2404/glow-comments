@@ -1,55 +1,95 @@
-# Glow Comments ⚡
+# Glow Comments ⚡ // Cognitive Verification HUD
 
-> **High-visibility neon glowing comments, dynamic inline hex colors, and modern semantic code annotations for VS Code and Cursor.**
+> **The visual verification HUD for AI-generated code, live diagnostics glow, and dual-spectrum semantic annotations for VS Code and Cursor.**
 
-Transform dead gray comments into an illuminated visual HUD. Whether you want subtle neon accent tags, vibrant cyberpunk warnings, or arbitrary hex color codes, **Glow Comments** renders luminous, aura-bordered annotations on the fly without bogging down your editor.
+Eliminate **AI Code Blindness** and lower the **Cognitive Verification Tax**. When coding agents (Claude Code, Gemini CLI, Cursor Agent) generate hundreds of lines of boilerplate, **Glow Comments** isolates critical assumptions, compiler warnings, and security boundaries with radiant contrast.
 
-![Glow Comments Live Preview](https://raw.githubusercontent.com/shikharthakur2404/glow-comments/main/demo.png)
+![Glow Comments Audit Lens](https://raw.githubusercontent.com/shikharthakur2404/glow-comments/main/assets/audit-lens-hud.jpg)
 
 ---
 
-## ✨ Features
+## ✨ Core Superpowers
 
-- 🌈 **Dynamic Hex Colors:** Type any 6-digit or 3-digit hex code directly inside a comment (`// [#FF007F]`) to render that exact color instantly.
-- ⚡ **Luminous Neon Presets:** Built-in cyber palette (`[#cyan]`, `[#pink]`, `[#lime]`, `[#purple]`, `[#gold]`, `[#matrix]`, and more).
-- 🎯 **Drop-in "Better Comments" Upgrade:** Supercharges legacy shortcuts (`!`, `?`, `TODO`, `*`, `HACK`, `FIXME`) with luminous ambient auras and borders.
-- 🎨 **Right-Click Color Palette:** Right-click any line and select **"Glow Comments: Insert Color Tag"** to pick from a sleek interactive QuickPick menu.
-- 🛡️ **Zero Lag & Zero Memory Leaks:** Cached decoration types with debounced updates ensure lightning-fast rendering even on 10,000+ line files.
-- 🌐 **Universal Language Support:** Works seamlessly across JavaScript, TypeScript, Python, C/C++, Java, Go, Rust, SQL, HTML, Markdown, Shell, and more.
+### 1. 🔍 The Risk Audit Lens (`Alt + Cmd + G` / `Alt + Ctrl + G`)
+- **Negative Space Verification:** Instantly dims 98% of safe boilerplate down to **22% opacity**.
+- **Radiant Isolation:** Active compiler/linter diagnostics and critical tags (`!`, `FIXME`, `HACK`, `TODO`) remain at **100% full radiance**.
+- **Status Bar HUD:** Real-time indicator displaying `$(eye) Audit Lens: ON (N flagged)`.
+
+### 2. 🌗 Dual-Spectrum Chroma Engine (Light & Dark Immunity)
+- **Dark Mode:** High-luminosity neon plasma emitters (`#00F0FF`, `#00FFA3`, `#FFE600`, `#FF1744`).
+- **Light Mode:** Deep jewel-ink pigments (`#00695C` Teal, `#1B5E20` Emerald, `#B26A00` Ochre, `#B71C1C` Crimson). Meets **WCAG AAA** ($\ge 4.5:1$ contrast ratio on white backgrounds).
+- **Zero Washout:** Seamlessly adapts via native VS Code decoration GPU layers with zero CPU penalty.
+
+![Dual-Spectrum Comparison](https://raw.githubusercontent.com/shikharthakur2404/glow-comments/main/assets/dual-spectrum.jpg)
+
+### 3. 🤖 AI Agent Verification Protocol (Claude Code, Cursor, Gemini CLI)
+- **File-as-IPC:** Teach your AI agents to use Glow Comments syntax during autonomous refactoring.
+- **One-Click Setup:** Run `Glow Comments: Initialize AI Agent Rules` to automatically inject the verification protocol into `.cursorrules`, `CLAUDE.md`, or `AGENTS.md`.
+
+### 4. ⚡ Diagnostics-as-Glow Engine
+- Listens to language server diagnostics (`vscode.languages.onDidChangeDiagnostics`) in real-time.
+- Illuminates TypeScript, ESLint, and security errors in **Radiant Crimson (`#FF1744`)** and warnings in **Toxic Amber (`#FFA600`)**.
+- Built with **80ms debouncing** and **diagnostic fingerprint diffing** to eliminate keystroke re-render flicker.
+
+---
+
+## ⚡ Quickstart: How to Use (in 60 Seconds)
+
+1. **Tag Critical Lines:** Prefix any comment with `// !`, `// TODO:`, `// FIXME:`, or custom hex `// [#cyan]`.
+2. **Engage the Audit Lens:** Press **`Alt + Cmd + G`** (`Alt + Ctrl + G` on Windows/Linux).
+   - Safe code dims to **22% opacity**.
+   - Your risk tags and compiler errors blaze at **100% full radiance**.
+3. **Check the Status Bar:** The bottom-right HUD displays `$(eye) Audit Lens: ON (N flagged)`. Click it anytime to toggle.
+4. **Switch Themes Freely:** Works on dark cyberpunk themes and crisp light themes with zero washout.
+
+---
+
+## 🤖 How to Tell Your AI (Claude Code, Cursor, Gemini CLI)
+
+Make your coding agents flag their own assumptions automatically. No plugins or API keys required—your code buffer is the communication bus.
+
+### Option 1: One-Click Auto-Setup
+1. Press `Cmd + Shift + P` (or `Ctrl + Shift + P`).
+2. Run **`Glow Comments: Initialize AI Agent Rules`**.
+3. Select your target (`.cursorrules`, `CLAUDE.md`, or `AGENTS.md`).
+
+---
+
+### Option 2: Copy-Paste Directive (For any Agent or Prompt)
+
+Paste this into your project's `.cursorrules`, `CLAUDE.md`, `AGENTS.md`, or directly into your terminal prompt:
+
+```markdown
+### Visual Verification Protocol (Glow Comments)
+When writing, refactoring, or reviewing code, use Glow Comments visual annotations so the human reviewer's Audit Lens (\`Alt+Cmd+G\` / \`Alt+Ctrl+G\`) instantly surfaces critical logic:
+- \`// ! [critical assumption]\` -> High-risk boundaries, auth flows, unverified inputs, data mutations.
+- \`// FIXME: [stub/debt]\` -> Mock implementations, temporary stubs, or performance bottlenecks.
+- \`// TODO: [human task]\` -> Required human review, missing API credentials, rate limits, env configs.
+- \`// ? [clarification]\` -> Ambiguous requirements, unverified external API contracts, design tradeoffs.
+- \`// NOTE: [architecture]\` -> Core subsystem invariants and architectural boundaries.
+```
 
 ---
 
 ## 🚀 Syntax Cheat Sheet
 
-### 1. Dynamic Hex Colors
-Place `[#RRGGBB]` at the start of any comment:
+### 1. High-Contrast Semantic Tags
 ```typescript
-// [#FF007F] Neon Pink: Memory optimization required here
-// [#00F0FF] Cyber Cyan: Interface boundary validated
-// [#FFE600] Solar Gold: Refactor planned for v2.0
-# [#00FFA3] Matrix Lime: Python background worker operational
-```
-
-### 2. Built-in Neon Presets
-Use `[#tagname]` or `[tagname]`:
-```typescript
-// [#cyan] System telemetry connected
-// [#pink] Critical authentication bypass check
-// [#lime] Safe memory boundary
-// [#purple] Architectural pivot note
-// [#gold] Payment webhook handler
-// [#matrix] Running inside local sandbox
-```
-
-### 3. Upgraded Semantic Tags
-```typescript
-// ! Critical security alert (Neon Red Aura)
-// ? Design query / architectural unknown (Cyber Blue)
-// TODO: Implement token refresh logic (Gold Highlight)
-// * Core algorithm optimization (Neon Lime)
-// HACK: Temporary workaround for upstream bug (Deep Violet)
-// FIXME: Race condition during hot reload (Orange Pulse)
+// ! Security alert / critical boundary (Crimson Red Aura)
+// TODO: Implement rate limiting & caching (Neon Amber Gold)
+// FIXME: Temporary mock implementation / stub (Urgent Orange)
+// ? Architectural unknown / unverified API contract (Cyber Blue)
+// * Core performance optimization (Emerald Neon)
+// HACK: Upstream library workaround (Deep Purple)
+// NOTE: Subsystem invariant & architectural note (Teal/Cyan)
 // // Deprecated function stub (Dimmed Strikethrough)
+```
+
+### 2. Dynamic Hex & Neon Presets
+```typescript
+// [#FF007F] Inline Hex: Custom neon pink highlight
+// [#cyan] Built-in Preset: Cyan plasma aura
+// [#matrix] Matrix Lime: Sandbox worker active
 ```
 
 ---
@@ -69,36 +109,31 @@ Open your `settings.json` (`Cmd + ,` or `Ctrl + ,`):
   // Enable subtle neon outline border
   "glowComments.enableBorder": true,
 
-  // Make glowing text bold
-  "glowComments.bold": true,
+  // Automatically illuminate compiler & linter warnings
+  "glowComments.enableDiagnosticGlow": true,
 
-  // Add your own custom team presets
+  // Opacity factor for non-flagged code in Audit Lens mode
+  "glowComments.auditLensDimOpacity": 0.22,
+
+  // Custom team presets
   "glowComments.customPresets": {
-    "danger": "#FF0033",
-    "team-alpha": "#00E5FF",
-    "backend": "#7B2CBF"
+    "security": "#FF003C",
+    "telemetry": "#00F0FF"
   }
 }
 ```
 
 ---
 
-## ⌨️ Commands
+## ⌨️ Commands & Shortcuts
 
-| Command | Title | Description |
+| Shortcut | Command | Description |
 |---|---|---|
-| `glowComments.insertTag` | **Glow Comments: Insert Color Tag** | Opens interactive color palette to insert a neon tag at cursor |
-| `glowComments.toggleGlow` | **Glow Comments: Toggle Glow Aura** | Instantly toggles background glow auras on/off |
-
----
-
-## 📦 Local Installation (VSIX)
-
-1. Download or package `glow-comments-0.1.0.vsix`.
-2. Open VS Code or Cursor.
-3. Open the **Extensions** panel (`Cmd + Shift + X`).
-4. Click the `...` menu in the top right → **"Install from VSIX..."**.
-5. Select `glow-comments-0.1.0.vsix`. Done!
+| `Alt + Cmd + G` | `glowComments.toggleAuditLens` | **Toggle Risk Audit Lens** (dims non-flagged code) |
+| — | `glowComments.initAgentRules` | **Initialize AI Agent Rules** (`.cursorrules`, `CLAUDE.md`, `AGENTS.md`) |
+| — | `glowComments.copyAgentRule` | **Copy AI Agent Protocol** to clipboard |
+| — | `glowComments.insertTag` | **Insert Color Tag** via interactive palette |
+| — | `glowComments.toggleGlow` | **Toggle Glow Aura** on/off |
 
 ---
 
