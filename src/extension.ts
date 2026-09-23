@@ -14,12 +14,12 @@ const DUAL_NEON_PRESETS: Record<string, DualColor> = {
   magenta: { dark: '#FF00A0', light: '#880E4F' },
   green: { dark: '#00FFA3', light: '#1B5E20' },
   'neon-green': { dark: '#00FFA3', light: '#1B5E20' },
-  lime: { dark: '#76FF03', light: '#2E7D32' },
+  lime: { dark: '#76FF03', light: '#1B5E20' },
   purple: { dark: '#BD00FF', light: '#4A148C' },
   'neon-purple': { dark: '#BD00FF', light: '#4A148C' },
   violet: { dark: '#D500F9', light: '#6A1B9A' },
-  yellow: { dark: '#FFE600', light: '#E65100' },
-  'neon-yellow': { dark: '#FFE600', light: '#E65100' },
+  yellow: { dark: '#FFE600', light: '#B26A00' },
+  'neon-yellow': { dark: '#FFE600', light: '#B26A00' },
   gold: { dark: '#FFD700', light: '#BF360C' },
   orange: { dark: '#FF7700', light: '#D84315' },
   'neon-orange': { dark: '#FF7700', light: '#D84315' },
@@ -29,7 +29,7 @@ const DUAL_NEON_PRESETS: Record<string, DualColor> = {
   'neon-blue': { dark: '#0091FF', light: '#0D47A1' },
   white: { dark: '#FFFFFF', light: '#212121' },
   matrix: { dark: '#00FF66', light: '#1B5E20' },
-  cyberpunk: { dark: '#FFE600', light: '#E65100' }
+  cyberpunk: { dark: '#FFE600', light: '#B26A00' }
 };
 
 // Semantic shortcuts: High contrast in both dark & light viewports
@@ -53,8 +53,8 @@ function getLightModeVariant(hex: string): string {
   const b = parseInt(c.slice(4, 6), 16);
   const lum = 0.299 * r + 0.587 * g + 0.114 * b;
   // If color is too luminous for white background, synthesize deep ink tone
-  if (lum > 130) {
-    const factor = 0.42;
+  if (lum > 110) {
+    const factor = 0.35;
     const dr = Math.floor(r * factor).toString(16).padStart(2, '0');
     const dg = Math.floor(g * factor).toString(16).padStart(2, '0');
     const db = Math.floor(b * factor).toString(16).padStart(2, '0');
@@ -205,8 +205,8 @@ export function activate(context: vscode.ExtensionContext) {
       },
       light: {
         color: lightHex,
-        backgroundColor: enableGlow ? `${lightHex}${getHexAlpha(glowOpacity * 0.85)}` : undefined,
-        border: (enableBorder && enableGlow) ? `1px solid ${lightHex}${getHexAlpha(0.40)}` : undefined,
+        backgroundColor: enableGlow ? `${lightHex}${getHexAlpha(0.08)}` : undefined,
+        border: (enableBorder && enableGlow) ? `1px solid ${lightHex}${getHexAlpha(0.35)}` : undefined,
         borderRadius: '3px'
       }
     };
@@ -305,7 +305,20 @@ export function activate(context: vscode.ExtensionContext) {
           if (prefix === '*' && (delimiter === '/*' || delimiter === '<!--')) {
             continue;
           }
-          if (trimmed.startsWith(prefix) || trimmed.startsWith(`[${prefix}]`)) {
+          let isMatch = trimmed.startsWith(prefix) || trimmed.startsWith(`[${prefix}]`);
+          if (!isMatch && /^[A-Z]+$/.test(prefix)) {
+            // Case-insensitive match for word tags (TODO, FIXME, HACK, NOTE) when followed by ':' or space
+            const lowerTrimmed = trimmed.toLowerCase();
+            const lowerPrefix = prefix.toLowerCase();
+            if (
+              lowerTrimmed.startsWith(lowerPrefix + ':') ||
+              lowerTrimmed.startsWith(lowerPrefix + ' ') ||
+              lowerTrimmed === lowerPrefix
+            ) {
+              isMatch = true;
+            }
+          }
+          if (isMatch) {
             matchedDarkHex = def.dark;
             matchedLightHex = def.light;
             isStrike = !!def.strike;
